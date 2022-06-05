@@ -6,7 +6,7 @@ const todos = new todoList()
 // GET all todos
 router.get('/todos', function (req, res) {
     res.type('application/json');
-    res.status(200).json(todos.getAllTodos());
+    res.status(201).json(todos.getAllTodos());
 })
 
 router.post('/todos', function (req, res) {

@@ -2,8 +2,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const listNode = document.getElementById('list') // id der unordered list im HTML
     const inputEintrag = document.getElementById('inputEintrag')
-    // Einfügen eines neuen Todos (POST /todos) &
-    // Hinzufügen des Todos auf der Website (Aufruf Funktion: addTodo)
+
     document.getElementById('button_save').addEventListener('click', async function (event) {
 
         let requestOptions = {
@@ -28,30 +27,28 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
             let response = await fetch('/todos/' + itemNode.id, requestOptions)
             let data = await response.text()
-            console.log(data)
+
 
         }
     }
 
     function getDoneClickHandler(itemNode) {
         return async function(){
-            // Ändern (done/undone) eines ToDos im Backend und auf der Website
-            // Frontend
             itemNode.style.textDecoration = "line-through"
             itemNode.querySelector('.todo_check').disabled = true
-            // Backend
+
             let requestOptions = {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(
+                body: JSON.stringify([
                     {"op": "replace",
                             "path": "/done",
-                            "value": true})
+                            "value": true}])
 
             }
             let response = await fetch('/todos/' + itemNode.id, requestOptions)
-            let data = await response.json()
-            console.log(data)
+
+
         }
     }
 
@@ -68,6 +65,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         listNode.insertAdjacentHTML('beforeend', rendered)
 
         let listItem = document.getElementById(item.id)
+        if(item.done){
+            listItem.style.textDecoration = "line-through"
+            listItem.querySelector('.todo_check').disabled = true
+            listItem.querySelector('.todo_check').checked = true
+        }
         listItem.querySelector('.todo_check').addEventListener('click', getDoneClickHandler(listItem))
         listItem.querySelector('.delete_links').addEventListener('click', getDeleteClickHandler(listItem))
     }
@@ -77,10 +79,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function loadAll() {
 
         let response = await fetch('/todos')
-        //liefert keine JSON Objekte zurück, kann mir aber nicht erklären warum
-        let data = await response
-        for(const todo of data){
-            await addTodo(data)
+        let data = await response.json()
+        for(let todo of data){
+            await addTodo(todo)
         }
     }
 
@@ -91,7 +92,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         let listItem = listNode.getElementsByTagName("li")
         for(let elem of listItem){
             if(elem.querySelector(".todo_check").checked){
-                // getDeleteClickHandler direkt zu benutzen funktioniert irgendwie nicht
                 elem.parentNode.removeChild(elem)
                 let requestOptions = {
                     method: "DELETE",
