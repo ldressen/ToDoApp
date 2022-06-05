@@ -89,19 +89,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Alle erledigten ToDos löschen &
     // auf der Website entfernen
     document.getElementById('deleteChecked').addEventListener('click', async function (event) {
-        let listItem = listNode.getElementsByTagName("li")
-        for(let elem of listItem){
-            if(elem.querySelector(".todo_check").checked){
-                elem.parentNode.removeChild(elem)
-                let requestOptions = {
-                    method: "DELETE",
-                    headers: { 'Content-Type': 'text/plain'}
-
-                }
-                let response = await fetch('/todos/' + elem.id, requestOptions)
-                let data = await response.text()
-            }
+        let requestOptions = {
+            method: "DELETE"
         }
+        let data = await fetch("/todos?done=true", requestOptions)
+        while (listNode.firstChild){
+            listNode.removeChild(listNode.firstChild)
+        }
+        await loadAll()
     })
 
     // Bei Beginn alle Einträge laden

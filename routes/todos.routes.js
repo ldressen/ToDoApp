@@ -43,19 +43,18 @@ router.delete('/todos/:id', function (req, res) {
     }
 
 })
-
-router.delete('/todos?done=true', function (req, res) {
-    console.log(todos.getAllTodos())
-    todos.clearDone()
-    // Aus irgendeinem Grund werden hier alle ToDos gelöscht, ich kann mir aber nicht erklären warum.
-    res.type('application/json')
-    res.status(200).json(todos.getAllTodos());
-})
-
 router.delete('/todos', function (req, res) {
-    todos.clear()
-    res.type('text/plain')
-    res.status(200).send("Successfully deleted all ToDos!")
+    if(typeof req.query.done != 'undefined'){
+        todos.clearDone()
+        res.type('application/json')
+        res.status(200).json(todos.getAllTodos());
+    }
+    else {
+        todos.clear()
+        res.type('text/plain')
+        res.status(200).send("Successfully deleted all ToDos!")
+    }
+
 })
 
 router.patch('/todos/:id', function (req, res) {
